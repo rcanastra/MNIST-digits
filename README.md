@@ -13,9 +13,9 @@ There are two ways to run the application. One way is to run the generate_mnist_
 Spacing is applied between digits according to user specified parameters.
 
 Arguments for generate_mnist_sequence():
-digits: the digits to be represented in the output image, in an iterable
-spacing_range: 2-tuple of ints storing the minimum and maximum spacing between digits, counted in pixels of width.
-image_width: the desired width of the output image
+1. digits: the digits to be represented in the output image, in an iterable
+2. spacing_range: 2-tuple of ints storing the minimum and maximum spacing between digits, counted in pixels of width.
+3. image_width: the desired width of the output image
 
 Output: float32 numpy array of size 28 by image_width
 
