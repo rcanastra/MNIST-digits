@@ -1,12 +1,15 @@
 import gzip
 import numpy
 
-'''Given a digit, allows selection of a random image representing that digit.
+'''Interfaces between MNIST files and the rest of the application,
+including testing.
+
+Given a digit, allows selection of a random image representing that digit.
 Requires files train-images-idx3-ubyte.gz and train-labels-idx1-ubyte.gz, from
 the MNIST homepage, to exist in the current directory.
 
-Internally handles images in original scale (0 to 255) but public methods
-return rescaled images.
+Internally handles images in original scale (0 to 255) but interfaces with
+floating point (0 to 1) scale.
 
 
 From outside this module, please only run the public methods, indicated below.
@@ -38,7 +41,8 @@ class InitializationException(Exception):
 # MNIST image pixel values range from 0 (white) to 255 (black).
 # Rescale the range to 1 (white) to 0 (black).
 def rescale(image):
-	return numpy.array((MNIST_PIXEL_MAX-image)/float(MNIST_PIXEL_MAX),dtype=numpy.float32)
+	rescaled = (MNIST_PIXEL_MAX-image)/float(MNIST_PIXEL_MAX)
+	return rescaled.astype(numpy.float32)
 
 def rescale_back(image):
 	return numpy.rint(MNIST_PIXEL_MAX - MNIST_PIXEL_MAX*image).astype(int)
@@ -91,7 +95,7 @@ def map_images_to_label():
 		map_image_to_label(image, label)
 
 def map_image_to_label(image, label):
-	global image_to_label:
+	global image_to_label
 	hashable_image = convert_image_hashable(image)
 	image_to_label[hashable_image] = label
 
@@ -100,7 +104,6 @@ def map_image_to_label(image, label):
 
 #-----------Public methods start-----------#
 
-# initialization requires processing the dataset, only run if necessary
 def initialize_if_necessary():
 	global has_initialized
 	if not has_initialized:
@@ -110,40 +113,50 @@ def initialize():
 	load_images()
 	load_labels()
 	group_images_by_label()
-	map_images_to_label()
 
 	global has_initialized
 	has_initialized = True
 
-def get_random_image(digit):
-	global has_initialized
-	if not has_initialized:
-		raise InitializationException('Please run MNISTDigits.initialize() \
-			or MNISTDigits.initialize_if_necessary() before calling \
-			MNISTDigits.get_rescaled_random_image()')
+# Allows constant time access to an image's label. Uses a lot of memory.
+def initialize_for_testing():
+	initialize_if_necessary()
+	map_images_to_label()
 
+def get_random_image(digit):
+	initialize_if_necessary()
 	digit_images = label_to_images[digit]
 	num_images = len(digit_images)
 	random_index = numpy.random.randint(0,num_images)
 	return rescale(digit_images[random_index])
 
 def get_random_images(digits):
+	if not has_initialized:
+		raise InitializationException('Please run MNISTDigits.initialize()'\
+			'or MNISTDigits.initialize_if_necessary() before using the'\
+			'MNISTDigits module.')
 	num_digits = len(digits)
 	images_array_shape = (num_digits, MNIST_IMAGE_HEIGHT, MNIST_IMAGE_WIDTH)
 	images = numpy.empty((images_array_shape))
 	for i, digit in enumerate(digits):
-		images[i] = get_rescaled_random_image(digit)
+		images[i] = get_random_image(digit)
 
 	return images
 
-def verify_image_is_digit(image, digit):
-	hashable_image_rescaled_back = convert_image_hashable(rescaled_back(image))
+
+# The methods below are mostly for the testing module
+
+def check_image_is_digit(image, digit):
+	hashable_image_rescaled_back = convert_image_hashable(rescale_back(image))
 	if hashable_image_rescaled_back in image_to_label:
 		return image_to_label[hashable_image_rescaled_back] == digit
 	return False
 
+def image_exists(image):
+	hashable_image_rescaled_back = convert_image_hashable(rescale_back(image))
+	return hashable_image_rescaled_back in image_to_label
+
 def get_label(image):
-	hashable_image_rescaled_back = convert_image_hashable(rescaled_back(image))
+	hashable_image_rescaled_back = convert_image_hashable(rescale_back(image))
 	return image_to_label[hashable_image_rescaled_back]
 
 #-----------Public methods end-----------#
