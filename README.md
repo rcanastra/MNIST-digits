@@ -21,6 +21,8 @@ Output: float32 numpy array of size 28 by image_width
 
 The spacing between digits is selected uniformly at random from among all possible spacing within spacing_range that results in the desired image_width. Note that the individual digits from the MNIST dataset all have width 28 pixels.
 
+The currently used algorithm for generating spacing is not very efficient when there are many digits and when the max possible spacing is large, so the code may run a while in those cases.
+
 Arguments for command line:
 1. the sequence of digits to be generated (no white space between digits)
 2. the minimum spacing between digits
