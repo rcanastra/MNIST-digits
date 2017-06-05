@@ -87,18 +87,3 @@ def random_point_region(n, max_val):
 		X = [X[i]/total for i in range(n)]
 
 	return X
-'''
-n=7
-k=3
-a=1
-b=3
-comp_count = {}
-for i in range(1000):
-	comp = tuple(random_composition(n,k,a,b))
-	if comp in comp_count:
-		comp_count[comp] += 1
-	else:
-		comp_count[comp] = 1
-
-print(comp_count)
-'''
