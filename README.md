@@ -6,7 +6,7 @@ Usage
 
 Given a sequence of digits, generates an image of those digits composed from the MNIST data. These images would be used to train classifiers and generative deep learning models.
 
-Requires files train-images-idx3-ubyte.gz and train-labels-idx1-ubyte.gz from MNIST homepage (http://yann.lecun.com/exdb/mnist/) to be placed in the same directory as the modules. File names must not be changed. 
+Requires files train-images-idx3-ubyte.gz and train-labels-idx1-ubyte.gz from MNIST homepage (http://yann.lecun.com/exdb/mnist/) to be placed in the same directory as the modules. File names must not be changed. Also requires the nonstandard libraries NumPy and Pillow to be installed.
 
 There are two ways to run the application. One way is to run the generate_mnist_sequence() method located in the MNISTSequence module. This returns a float32 numpy array with values ranging from 0 (black, foreground) to 1 (white, background). The other is to run the MNISTSequence.py script with command line arguments via python. This produces a png file in the current directory. In either case, the resulting image is 28 rows by a user specified number of columns.
 
